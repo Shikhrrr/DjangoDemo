@@ -5,11 +5,13 @@ Chai aur Tweet
 {% endblock %}
 
 {% block content %}
-    <h1 class="text-center">Welcome to django project</h1>
+    <h1 class="text-center">Read and Create Tweets</h1>
 
-    <a href="{% url 'tweet_create' %}" class="btn btn-primary m-4">
-        Create Tweet
-    </a>
+    <div class="d-flex justify-content-center m-4">
+        <a href="{% url 'tweet_create' %}" class="btn btn-primary">
+            Create Tweet
+        </a>
+    </div>
     <div class="container row gap-3 m-4">
         {% for tweet in tweets %}
             <div class="card" style="width: 18rem;">
@@ -17,7 +19,7 @@ Chai aur Tweet
                     <img src={{tweet.photo.url}} class="card-img-top" alt="...">
                 {% endif %}
                 <div class="card-body">
-                    <h5 class="card-title">{{tweet.user.username}}'s Tweet</h5>
+                    <h5 class="card-title">{{tweet.user.username}}'s tweet</h5>
                     <p class="card-text">{{tweet.text}}</p>
                     {% if tweet.user == user %}
                         <a href="{% url 'tweet_edit' tweet.id %}" class="btn btn-primary">Edit</a>
