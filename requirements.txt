@@ -1,9 +1,9 @@
-altgraph==0.17.2
+# altgraph==0.17.2
 asgiref==3.8.1
 Django==4.2.23
 future==0.18.2
 macholib==1.15.2
-numpy==2.0.2
+# numpy==2.0.2
 pillow==11.2.1
 six==1.15.0
 sqlparse==0.5.3
