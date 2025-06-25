@@ -5,60 +5,153 @@ Chai aur Tweet
 {% endblock %}
 
 {% block content %}
-    <h1 class="text-center">Read and Create Tweets</h1>
+<h1 class="text-center my-4 fw-bold">Read and Create Tweets</h1>
 
-    <div class="d-flex justify-content-center m-4">
-        <a href="{% url 'tweet_create' %}" class="btn btn-primary">
-            Create Tweet
-        </a>
-    </div>
-    <div class="container row gap-3 m-4">
-        {% for tweet in tweets %}
-            <div class="card" style="width: 18rem;">
-                {% if tweet.photo %}
-                    <img src={{tweet.photo.url}} class="card-img-top" alt="...">
-                {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title">{{tweet.user.username}}'s tweet</h5>
-                    <p class="card-text">{{tweet.text}}</p>
+<div class="d-flex justify-content-center mb-4">
+    <a href="{% url 'tweet_create' %}" class="btn btn-success">Create Tweet</a>
+</div>
 
-                    <form method='post' action="{% url 'like_tweet' tweet.id %}">
-                        {% csrf_token %}
-                        <button class="bg-transparent border-0 fs-5">
-                            {% if user in tweet.likes.all %}
-                                ❤️
-                            {%else%}
-                                ♡
-                            {% endif %}
-                             {{ tweet.likes.count }}
-                        </button>
-                    </form>
+<div class="container">
+    {% for tweet in tweets %}
+    <div class="card mx-auto mb-4 shadow-sm" style="max-width: 600px; border-radius: 12px;">
+        {% if tweet.photo %}
+            <img src="{{ tweet.photo.url }}" class="card-img-top rounded-top" alt="Tweet Image" style="max-height: 300px; object-fit: cover;">
+        {% endif %}
 
-                <button class="btn btn-sm btn-secondary mt-2" data-bs-toggle="collapse" data-bs-target="#likes-{{ tweet.id }}">
-                    Show Likes
-                </button>
+        <div class="card-body">
+            <h5 class="card-title fw-semibold">@{{ tweet.user.username }}</h5>
+            <p class="card-text fs-6">{{ tweet.text }}</p>
 
-                <!-- Collapsible likes list -->
-                <div id="likes-{{ tweet.id }}" class="collapse mt-2">
-                    <ul class="list-group list-group-flush">
-                        {% for liker in tweet.likes.all %}
-                            {% if liker.username == user.username %}
-                                <li class="list-group-item">{{ liker.username }} (You)</li>
-                            {% else %}
-                                <li class="list-group-item">{{ liker.username }}</li>
-                            {% endif %}
-                        {% empty %}
-                            <li class="list-group-item text-muted">No likes yet</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-
-                    {% if tweet.user == user %}
-                        <a href="{% url 'tweet_edit' tweet.id %}" class="btn btn-primary">Edit</a>
-                        <a href="{% url 'tweet_delete' tweet.id %}" class="btn btn-danger">Delete</a>
+            <form method="post" action="{% url 'like_tweet' tweet.id %}" class="d-inline">
+                {% csrf_token %}
+                <button class="bg-transparent border-0 fs-5">
+                    {% if user in tweet.likes.all %}
+                        ❤️
+                    {% else %}
+                        ♡
                     {% endif %}
-                </div>
+                    {{ tweet.likes.count }}
+                </button>
+            </form>
+
+            <button class="btn btn-sm btn-outline-secondary float-end" data-bs-toggle="collapse" data-bs-target="#likes-{{ tweet.id }}">
+                Show Likes
+            </button>
+
+            <!-- Likes collapse -->
+            <div id="likes-{{ tweet.id }}" class="collapse mt-2">
+                <ul class="list-group list-group-flush">
+                    {% for liker in tweet.likes.all %}
+                        <li class="list-group-item small">
+                            {{ liker.username }}{% if liker == user %} (You){% endif %}
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item text-muted">No likes yet</li>
+                    {% endfor %}
+                </ul>
             </div>
-        {% endfor %}
+
+            {% if tweet.user == user %}
+                <div class="mt-3">
+                    <a href="{% url 'tweet_edit' tweet.id %}" class="btn btn-sm btn-outline-primary me-2">Edit</a>
+                    <a href="{% url 'tweet_delete' tweet.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Styled Comments Section -->
+        <div class="px-3 py-3 border-top" style="border-radius: 0 0 12px 12px;">
+            <h6 class="mb-3 fw-semibold text-secondary">Comments</h6>
+
+            <!-- Add Comment Form -->
+            <form method="POST" action="{% url 'add_comment' tweet.id %}">
+                {% csrf_token %}
+                <div class="input-group mt-2">
+                    <input type="text" name="text" class="form-control" placeholder="Add a comment..." required>
+                    <button type="submit" class="btn btn-outline-primary">Post</button>
+                </div>
+            </form>
+
+            <h6 class="mt-3">Recent Comments</h6>
+            {% for comment in tweet.comments.all %}
+                {% if not comment.parent %}
+                    <div class="border rounded p-2 mb-3 position-relative">
+                        <strong>{{ comment.user.username }}</strong>: {{ comment.text }}
+
+                        <!-- Options Dropdown -->
+                        {% if comment.user == user %}
+                        <div class="dropdown float-end">
+                            <button class="btn btn-sm " data-bs-toggle="dropdown">⋯</button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" onclick="toggleEditForm('{{ comment.id }}')">Edit</a></li>
+                                <li>
+                                    <form method="POST" action="{% url 'comment_action' comment.id 'delete' %}">
+                                        {% csrf_token %}
+                                        <button class="dropdown-item" type="submit">Delete</button>
+                                    </form>
+                                </li>
+                                <li><a class="dropdown-item" href="#" onclick="toggleReplyForm('{{ comment.id }}')">Reply</a></li>
+                            </ul>
+                        </div>
+                        {% endif %}
+
+                        <!-- Edit Form -->
+                        <form method="POST" action="{% url 'comment_action' comment.id 'edit' %}" id="edit-form-{{ comment.id }}" class="mt-2" style="display: none;">
+                            {% csrf_token %}
+                            <input type="text" name="text" value="{{ comment.text }}" class="form-control d-inline w-75" />
+                            <button type="submit" class="btn btn-sm btn-success">Save</button>
+                            <button type="button" onclick="toggleEditForm('{{ comment.id }}')" class="btn btn-sm btn-secondary">Cancel</button>
+                        </form>
+
+                        <!-- Reply Form -->
+                        <form method="POST" action="{% url 'reply_comment' tweet.id comment.id %}" id="reply-form-{{ comment.id }}" style="display: none;" class="mt-2">
+                            {% csrf_token %}
+                            <div class="input-group">
+                                <input type="text" name="text" class="form-control" placeholder="Write a reply...">
+                                <button class="btn btn-outline-primary btn-sm" type="submit">Reply</button>
+                            </div>
+                        </form>
+
+                        <!-- Replies -->
+                        {% for reply in comment.replies.all %}
+                            <div class="border rounded p-2 mt-2 ms-4t">
+                                <strong>{{ reply.user.username }}</strong>: {{ reply.text }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% empty %}
+                <p class="text-muted">No comments yet.</p>
+            {% endfor %}
+        </div>
     </div>
-    {% endblock %}
+    {% endfor %}
+
+</div>
+
+<script>
+    function toggleEditForm(commentId) {
+        const form = document.getElementById(`edit-form-${commentId}`);
+        form.style.display = form.style.display === "none" ? "block" : "none";
+    }
+
+    function toggleEditForm(commentId) {
+        const form = document.getElementById(`edit-form-${commentId}`);
+        if (form.style.display === "none" || form.style.display === "") {
+            form.style.display = "block";
+        } else {
+            form.style.display = "none";
+        }
+    }
+
+    function toggleReplyForm(commentId) {
+        const form = document.getElementById(`reply-form-${commentId}`);
+        if (form.style.display === "none" || form.style.display === "") {
+            form.style.display = "block";
+        } else {
+            form.style.display = "none";
+        }
+    }
+
+</script>
+{% endblock %}

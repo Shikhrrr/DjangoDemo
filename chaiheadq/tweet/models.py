@@ -12,3 +12,17 @@ class Tweet(models.Model):
 
     def __str__(self):
         return f'{self.user.username} - {self.text[:10]}'
+    
+class Comments(models.Model):
+    tweet = models.ForeignKey(Tweet, on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    parent = models.ForeignKey('self', null=True, blank=True, related_name="replies", on_delete=models.CASCADE)
+
+    def is_reply(self):
+        return self.parent is not None
+
+    def __str__(self):
+        return f'{self.user.username} on {self.tweet.id}'
+    

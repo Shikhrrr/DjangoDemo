@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from .models import Tweet
-from .forms import TweetForm, UserRegistrationForm
+from .models import Tweet, Comments
+from .forms import TweetForm, UserRegistrationForm, CommentForm
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
@@ -11,7 +11,11 @@ def index(request):
 
 def tweet_list(request):
     tweets = Tweet.objects.all().order_by('-created_at')
-    return render(request, 'tweet_list.html', {'tweets': tweets})
+    comment_form = CommentForm
+    return render(request, 'tweet_list.html', {
+            'tweets': tweets, 
+            'comment_form': comment_form
+        })
 
 @login_required
 def tweet_create(request):
@@ -69,3 +73,40 @@ def like_tweet(request, tweet_id):
     else:
         tweet.likes.add(request.user)
     return redirect('tweet_list')
+
+@login_required
+def add_comment(request, tweet_id, parent_id=None):
+    tweet = get_object_or_404(Tweet, pk=tweet_id)
+    parent = Comments.objects.filter(id=parent_id).first() if parent_id else None
+
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.user = request.user
+            comment.parent = parent
+            comment.tweet = tweet
+            comment.save()
+            return redirect('tweet_list')
+    else:
+        form = CommentForm()
+    return redirect('tweet_list')
+
+@login_required
+def comment_action(request, comment_id, action):
+    comment = get_object_or_404(Comments, pk=comment_id, user=request.user)
+
+    if action == 'edit':
+        if request.method == 'POST':
+            form = CommentForm(request.POST, instance=comment)
+            if form.is_valid():
+                form.save()
+                return redirect('tweet_list')
+            
+    elif action == 'delete':
+        if request.method == 'POST':
+            comment.delete()
+            return redirect('tweet_list')
+        
+    return redirect('tweet_list')
+    
