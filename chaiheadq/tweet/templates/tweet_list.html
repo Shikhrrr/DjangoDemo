@@ -21,6 +21,38 @@ Chai aur Tweet
                 <div class="card-body">
                     <h5 class="card-title">{{tweet.user.username}}'s tweet</h5>
                     <p class="card-text">{{tweet.text}}</p>
+
+                    <form method='post' action="{% url 'like_tweet' tweet.id %}">
+                        {% csrf_token %}
+                        <button class="bg-transparent border-0 fs-5">
+                            {% if user in tweet.likes.all %}
+                                ❤️
+                            {%else%}
+                                ♡
+                            {% endif %}
+                             {{ tweet.likes.count }}
+                        </button>
+                    </form>
+
+                <button class="btn btn-sm btn-secondary mt-2" data-bs-toggle="collapse" data-bs-target="#likes-{{ tweet.id }}">
+                    Show Likes
+                </button>
+
+                <!-- Collapsible likes list -->
+                <div id="likes-{{ tweet.id }}" class="collapse mt-2">
+                    <ul class="list-group list-group-flush">
+                        {% for liker in tweet.likes.all %}
+                            {% if liker.username == user.username %}
+                                <li class="list-group-item">{{ liker.username }} (You)</li>
+                            {% else %}
+                                <li class="list-group-item">{{ liker.username }}</li>
+                            {% endif %}
+                        {% empty %}
+                            <li class="list-group-item text-muted">No likes yet</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
                     {% if tweet.user == user %}
                         <a href="{% url 'tweet_edit' tweet.id %}" class="btn btn-primary">Edit</a>
                         <a href="{% url 'tweet_delete' tweet.id %}" class="btn btn-danger">Delete</a>
