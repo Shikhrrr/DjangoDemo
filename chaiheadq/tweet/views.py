@@ -89,40 +89,86 @@ def like_tweet(request, tweet_id):
     # Handle regular form submission (fallback)
     return redirect('tweet_list')
 
+from django.views.decorators.csrf import csrf_exempt  # if needed
+
 @login_required
 def add_comment(request, tweet_id, parent_id=None):
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        # Handle AJAX request
         tweet = get_object_or_404(Tweet, id=tweet_id)
-        comment = Comments.objects.create(
+        text = request.POST.get('text')
+
+        if not text:
+            return JsonResponse({'success': False, 'error': 'Empty comment'}, status=400)
+
+        comment = Comments(
             user=request.user,
             tweet=tweet,
-            text=request.POST.get('text')
+            text=text
         )
+
+        # Handle reply (if parent_id is present)
+        if parent_id:
+            try:
+                parent_comment = Comments.objects.get(id=parent_id, tweet=tweet)
+                comment.parent = parent_comment
+            except Comments.DoesNotExist:
+                return JsonResponse({'success': False, 'error': 'Parent comment not found'}, status=404)
+
+        comment.save()
+
         return JsonResponse({
             'success': True,
             'comment_id': comment.id,
             'username': request.user.username,
             'text': comment.text,
-            'tweet_id': tweet_id
+            'tweet_id': tweet_id,
+            'parent_id': parent_id
         })
+
     return redirect('tweet_list')
+
 
 @login_required
 def comment_action(request, comment_id, action):
     comment = get_object_or_404(Comments, pk=comment_id, user=request.user)
-
-    if action == 'edit':
-        if request.method == 'POST':
-            form = CommentForm(request.POST, instance=comment)
-            if form.is_valid():
-                form.save()
-                return redirect('tweet_list')
-            
-    elif action == 'delete':
-        if request.method == 'POST':
-            comment.delete()
-            return redirect('tweet_list')
-        
-    return redirect('tweet_list')
     
+    if request.method == 'POST':
+        if action == 'edit':
+            # Get the new text from the form
+            new_text = request.POST.get('text', '').strip()
+            
+            if new_text:  # Only update if text is not empty
+                comment.text = new_text
+                comment.save()
+                
+                # Check if this is an AJAX request
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': True,
+                        'action': 'edit',
+                        'comment_id': comment_id,
+                        'new_text': comment.text,
+                        'message': 'Comment updated successfully'
+                    })
+            else:
+                # Handle empty text case
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': False,
+                        'error': 'Comment text cannot be empty'
+                    })
+                    
+        elif action == 'delete':
+            comment.delete()
+            
+            # Check if this is an AJAX request
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': True,
+                    'action': 'delete',
+                    'comment_id': comment_id,
+                    'message': 'Comment deleted successfully'
+                })
+    
+    # Handle regular form submission (fallback) or invalid requests
+    return redirect('tweet_list')
