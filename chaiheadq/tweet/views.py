@@ -4,6 +4,7 @@ from .forms import TweetForm, UserRegistrationForm, CommentForm
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
+from django.http import JsonResponse
 
 # Create your views here.
 def index(request):
@@ -67,29 +68,44 @@ def register(request):
 
 @login_required
 def like_tweet(request, tweet_id):
-    tweet = get_object_or_404(Tweet, pk=tweet_id)
+    tweet = get_object_or_404(Tweet, id=tweet_id)
+    
+    # Handle the like/unlike logic
     if request.user in tweet.likes.all():
         tweet.likes.remove(request.user)
+        liked = False
     else:
         tweet.likes.add(request.user)
+        liked = True
+    
+    # Check if this is an AJAX request
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({
+            'success': True,
+            'liked': liked,
+            'like_count': tweet.likes.count()
+        })
+    
+    # Handle regular form submission (fallback)
     return redirect('tweet_list')
 
 @login_required
 def add_comment(request, tweet_id, parent_id=None):
-    tweet = get_object_or_404(Tweet, pk=tweet_id)
-    parent = Comments.objects.filter(id=parent_id).first() if parent_id else None
-
-    if request.method == 'POST':
-        form = CommentForm(request.POST)
-        if form.is_valid():
-            comment = form.save(commit=False)
-            comment.user = request.user
-            comment.parent = parent
-            comment.tweet = tweet
-            comment.save()
-            return redirect('tweet_list')
-    else:
-        form = CommentForm()
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        # Handle AJAX request
+        tweet = get_object_or_404(Tweet, id=tweet_id)
+        comment = Comments.objects.create(
+            user=request.user,
+            tweet=tweet,
+            text=request.POST.get('text')
+        )
+        return JsonResponse({
+            'success': True,
+            'comment_id': comment.id,
+            'username': request.user.username,
+            'text': comment.text,
+            'tweet_id': tweet_id
+        })
     return redirect('tweet_list')
 
 @login_required
