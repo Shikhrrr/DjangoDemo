@@ -18,15 +18,18 @@
         <a class="navbar-brand" href="{% url 'tweet_list' %}">TweetBar</a>
         {% comment %} <a href="{% url 'tweet_list' %}" class="btn btn-primary mx-2">Tweet Home</a> {% endcomment %}
         {% if user.is_authenticated %}
-        <form method="POST" action="{% url 'logout' %}">
-        {% csrf_token %}
-        <button class="btn btn-danger" type="submit">Logout</button>
-        </form>
-        {% else %}
-        <div class="ms-auto d-flex align-items-center">
-          <a href="{% url 'login' %}" class="btn btn-primary mx-2">Login</a>
-          <a href="{% url 'register' %}" class="btn btn-primary mx-2">Register</a>
+        <div class="d-flex align-items-center ms-auto">
+          <a href="{% url 'profile_page' user.username %}" class="btn btn-primary me-2">Profile</a>
+          <form method="POST" action="{% url 'logout' %}" class="mb-0">
+            {% csrf_token %}
+            <button class="btn btn-danger" type="submit">Logout</button>
+          </form>
         </div>
+        {% else %}
+          <div class="ms-auto d-flex align-items-center">
+            <a href="{% url 'login' %}" class="btn btn-primary mx-2">Login</a>
+            <a href="{% url 'register' %}" class="btn btn-primary mx-2">Register</a>
+          </div>
         </div>
       </div>
 

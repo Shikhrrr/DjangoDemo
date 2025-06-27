@@ -10,9 +10,11 @@ class TweetForm(forms.ModelForm):
 
 class UserRegistrationForm(UserCreationForm):
     email = forms.EmailField()
+    bio = forms.CharField(widget=forms.Textarea(attrs={'rows':3}), required=False)
+    profile_image = forms.ImageField(required=False)
     class Meta:
         model = User
-        fields = ('username', 'email', 'password1', 'password2')
+        fields = ('username', 'email', 'password1', 'password2', 'bio', 'profile_image')
 
 class CommentForm(forms.ModelForm):
     class Meta:

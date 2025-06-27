@@ -9,6 +9,7 @@ urlpatterns = [
     path('<int:tweet_id>/edit/', views.tweet_edit, name='tweet_edit'),  # ✅ must come before comment routes with similar patterns
     path('<int:tweet_id>/delete/', views.tweet_delete, name='tweet_delete'),
     path('<int:tweet_id>/like/', views.like_tweet, name='like_tweet'),
+    # path('profile/<string:user>', views.profile_page, name='profile_page'),
 
     # Comment Routes
     path('<int:tweet_id>/add/', views.add_comment, name='add_comment'),
@@ -17,4 +18,8 @@ urlpatterns = [
 
     # User Auth
     path('register/', views.register, name='register'),
+
+    #Profile
+    path('user/<str:username>/', views.profile_page, name='profile_page'),
+
 ]

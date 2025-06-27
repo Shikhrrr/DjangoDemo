@@ -1,10 +1,12 @@
 from django.shortcuts import render
-from .models import Tweet, Comments
+from .models import Tweet, Comments, Profile
 from .forms import TweetForm, UserRegistrationForm, CommentForm
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
 from django.http import JsonResponse
+from django.contrib.auth.models import User
+
 
 # Create your views here.
 def index(request):
@@ -54,11 +56,16 @@ def tweet_delete(request, tweet_id):
 
 def register(request):
     if request.method == 'POST':
-        form = UserRegistrationForm(request.POST)
+        form = UserRegistrationForm(request.POST, request.FILES)
+
         if form.is_valid():
             user = form.save(commit=False)
             user.set_password(form.cleaned_data['password1'])
             user.save()
+            bio = form.cleaned_data.get('bio')
+            profile_image = form.cleaned_data.get('profile_image')
+            # Manually create Profile
+            Profile.objects.create(user=user, bio=bio, profile_image=profile_image)
             login(request, user)
 
             return redirect('tweet_list')
@@ -172,3 +179,16 @@ def comment_action(request, comment_id, action):
     
     # Handle regular form submission (fallback) or invalid requests
     return redirect('tweet_list')
+
+def profile_page(request, username):
+    user_profile = get_object_or_404(User, username=username)
+    try:
+        profile = user_profile.profile
+    except Profile.DoesNotExist:
+        profile = Profile.objects.create(user=user_profile)
+    
+    return render(request, 'profile_page.html', {
+        'profile': profile,
+        'user_profile': user_profile,
+    })
+
