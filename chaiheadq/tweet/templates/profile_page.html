@@ -5,32 +5,224 @@
 {% load static %}
 
 {% block content %}
-    <div class="container mt-4">
-    <div class="card p-3">
-        <div class="d-flex align-items-center">
-            {% if profile.profile_image %}
-                <img src="{{ profile.profile_image.url }}" class="rounded-circle me-3" width="80" height="80">
-            {% else %}
-                <img src="{% static 'default_profile.png' %}" class="rounded-circle me-3" width="80" height="80">
-            {% endif %}
-            <div>
-                <h4>{{ profile.user.username }}</h4>
-                
-                {% comment %} {% if user == profile.user %}
-                    <a href="{% url 'edit_profile' %}" class="btn btn-sm btn-outline-primary">Edit Profile</a>
-                {% else %}
-                    <!-- Follow button coming soon -->
-                    <button class="btn btn-sm btn-outline-success">Follow</button>
-                {% endif %} {% endcomment %}
-
-                {% if profile.bio %}
-                    <p class="text-muted">{{ profile.bio|linebreaksbr }}</p>
-                {% else %}
-                    <p class="text-muted fst-italic">No bio added yet.</p>
-                {% endif %}
-
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <!-- Profile Card -->
+            <div class="card shadow border-0 mb-4" style="border-radius: 15px;">
+                <div class="card-body p-4">
+                    <!-- Profile Header -->
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="me-4 position-relative">
+                            {% if profile.profile_image %}
+                                <img src="{{ profile.profile_image.url }}" class="rounded-circle border border-3 border-light shadow-sm" width="110" height="110" style="object-fit: cover;">
+                            {% else %}
+                                <img src="{% static 'default_profile.png' %}" class="rounded-circle border border-3 border-light shadow-sm" width="110" height="110" style="object-fit: cover;">
+                            {% endif %}
+                        </div>
+                        <div class="flex-grow-1">
+                            <h2 class="mb-1 fw-bold">{{ profile.user.username }}</h2>
+                            <p class="text-muted small mb-3">@{{ profile.user.username }}</p>
+                            {% if profile.bio %}
+                                <p class="text-muted mb-3 lh-base">{{ profile.bio|linebreaksbr }}</p>
+                            {% else %}
+                                <p class="text-muted fst-italic mb-3">No bio added yet.</p>
+                            {% endif %}
+                            
+                            {% if user != profile.user %}
+                                <form method="POST" action="{% url 'toggle_follow' username=profile.user.username %}" class="d-inline">
+                                    {% csrf_token %}
+                                    {% if user in profile.followers.all %}
+                                        <button class="btn btn-outline-danger btn-sm px-4" style="border-radius: 20px;">
+                                            <i class="fas fa-user-minus me-1"></i> Unfollow
+                                        </button>
+                                    {% else %}
+                                        <button class="btn btn-primary btn-sm px-4" style="border-radius: 20px;">
+                                            <i class="fas fa-user-plus me-1"></i> Follow
+                                        </button>
+                                    {% endif %}
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Stats -->
+                    <div class="row text-center border-top pt-4">
+                        <div class="col-4">
+                            <button class="btn btn-link text-decoration-none p-0 w-100" type="button" data-bs-toggle="collapse" data-bs-target="#followersList">
+                                <div class="fw-bold fs-4 text-primary">{{ profile.followers.count }}</div>
+                                <div class="text-muted small text-uppercase fw-medium">Followers</div>
+                            </button>
+                        </div>
+                        <div class="col-4">
+                            <button class="btn btn-link text-decoration-none p-0 w-100" type="button" data-bs-toggle="collapse" data-bs-target="#followingList">
+                                <div class="fw-bold fs-4 text-success">{{ following_profiles.count }}</div>
+                                <div class="text-muted small text-uppercase fw-medium">Following</div>
+                            </button>
+                        </div>
+                        <div class="col-4">
+                            <button class="btn btn-link text-decoration-none p-0 w-100" type="button" data-bs-toggle="collapse" data-bs-target="#activitySection">
+                                <div class="fw-bold fs-4 text-info">{{ tweets.count }}</div>
+                                <div class="text-muted small text-uppercase fw-medium">Posts</div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Followers List -->
+            <div class="collapse mb-3" id="followersList">
+                <div class="card shadow-sm border-0" style="border-radius: 12px; background: transparent;">
+                    <div class="card-header text-white border-0" style="border-radius: 12px 12px 0 0;">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-users me-2"></i>
+                            <h6 class="mb-0">Followers</h6>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if follower_profiles %}
+                            {% for follower in follower_profiles %}
+                                <div class="d-flex align-items-center p-3 border-bottom">
+                                    {% if follower.profile.profile_image %}
+                                        <img src="{{ follower.profile.profile_image.url }}" class="rounded-circle me-3 shadow-sm" width="50" height="50" style="object-fit: cover;">
+                                    {% else %}
+                                        <img src="{% static 'default_profile.png' %}" class="rounded-circle me-3 shadow-sm" width="50" height="50" style="object-fit: cover;">
+                                    {% endif %}
+                                    <div class="flex-grow-1">
+                                        <a href="/tweet/user/{{ follower.username }}/" class="text-decoration-none">
+                                            <div class="fw-medium text-white">@{{ follower.username }}</div>
+                                            <div class="text-muted small">{{ follower.first_name }} {{ follower.last_name }}</div>
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="p-5 text-center text-muted">
+                                <i class="fas fa-user-friends fa-3x mb-3 opacity-50"></i>
+                                <p class="mb-0">No followers yet.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Following List -->
+            <div class="collapse mb-3" id="followingList">
+                <div class="card shadow-sm border-0" style="border-radius: 12px; background: transparent;">
+                    <div class="card-header text-white border-0" style="border-radius: 12px 12px 0 0;">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-user-check me-2"></i>
+                            <h6 class="mb-0">Following</h6>
+                        </div>
+                    </div>
+                    <div class="card-body p-0" >
+                        {% if following_profiles.exists %}
+                            {% for following in following_profiles %}
+                                <div class="d-flex align-items-center p-3 border-bottom">
+                                    {% if following.profile_image %}
+                                        <img src="{{ following.profile_image.url }}" class="rounded-circle me-3 shadow-sm" width="50" height="50" style="object-fit: cover;">
+                                    {% else %}
+                                        <img src="{% static 'default_profile.png' %}" class="rounded-circle me-3 shadow-sm" width="50" height="50" style="object-fit: cover;">
+                                    {% endif %}
+                                    <div class="flex-grow-1">
+                                        <a href="/tweet/user/{{ following.user.username }}/" class="text-decoration-none">
+                                            <div class="fw-medium text-light">@{{ following.user.username }}</div>
+                                            <div class="text-muted small">{{ following.user.first_name }} {{ following.user.last_name }}</div>
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="p-5 text-center text-muted">
+                                <i class="fas fa-user-plus fa-3x mb-3 opacity-50"></i>
+                                <p class="mb-0">Not following anyone yet.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Activity Section -->
+            <div class="collapse show" id="activitySection">
+                <div class="card shadow-sm border-0" style="border-radius: 12px; background: transparent;">
+                    <div class="card-header bg-green text-white border-0" style="border-radius: 12px 12px 0 0;">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-stream me-2"></i>
+                                <h5 class="mb-0">Recent Activity</h5>
+                            </div>
+                            <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#activitySection">
+                                <i class="fas fa-chevron-up">Close</i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if tweets %}
+                            <div class="p-3">
+                                {% for tweet in tweets %}
+                                    <div class="card mb-3 border-1 shadow-sm" style="border-radius: 10px;">
+                                        <div class="card-body p-4">
+                                            {% if tweet.photo %}
+                                                <div class="mb-3">
+                                                    <img src="{{ tweet.photo.url }}" class="img-fluid rounded-3 shadow-sm" alt="Tweet Image" style="max-height: 400px; width: 100%; object-fit: cover;">
+                                                </div>
+                                            {% endif %}
+                                            <p class="mb-3 lh-base ">{{ tweet.text }}</p>
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <small class="text-muted d-flex align-items-center">
+                                                    <i class="far fa-clock me-1"></i>
+                                                    {{ tweet.created_at|date:"M d, Y \a\t g:i A" }}
+                                                </small>
+                                                <div class="d-flex align-items-center">
+                                                    <form method="post" action="{% url 'like_tweet' tweet.id %}" class="d-inline like-form" data-tweet-id="{{ tweet.id }}">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="bg-transparent border-0 fs-5 like-btn">
+                                                            {% if user in tweet.likes.all %}
+                                                                ❤️
+                                                            {% else %}
+                                                                ♡
+                                                            {% endif %}
+                                                            <span class="like-count">{{ tweet.likes.count }}</span>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% empty %}
+                                    <div class="text-center text-muted py-5">
+                                        <i class="fas fa-feather-alt fa-3x mb-3 opacity-50"></i>
+                                        <h5>No posts yet</h5>
+                                        <p class="mb-0">When {{ profile.user.username }} shares something, it will appear here.</p>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center text-muted py-5">
+                                <i class="fas fa-feather-alt fa-3x mb-3 opacity-50"></i>
+                                <h5>No posts yet</h5>
+                                <p class="mb-0">When {{ profile.user.username }} shares something, it will appear here.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+.btn:hover {
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
+}
+
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+</style>
 {% endblock %}

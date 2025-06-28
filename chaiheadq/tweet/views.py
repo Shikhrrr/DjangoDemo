@@ -6,6 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
 from django.http import JsonResponse
 from django.contrib.auth.models import User
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 
 
 # Create your views here.
@@ -17,7 +19,7 @@ def tweet_list(request):
     comment_form = CommentForm
     return render(request, 'tweet_list.html', {
             'tweets': tweets, 
-            'comment_form': comment_form
+            'comment_form': comment_form,
         })
 
 @login_required
@@ -57,21 +59,23 @@ def tweet_delete(request, tweet_id):
 def register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST, request.FILES)
-
         if form.is_valid():
             user = form.save(commit=False)
             user.set_password(form.cleaned_data['password1'])
             user.save()
-            bio = form.cleaned_data.get('bio')
-            profile_image = form.cleaned_data.get('profile_image')
-            # Manually create Profile
-            Profile.objects.create(user=user, bio=bio, profile_image=profile_image)
-            login(request, user)
 
+            # Update profile created via signal
+            profile = user.profile
+            profile.bio = form.cleaned_data.get('bio')
+            profile.profile_image = form.cleaned_data.get('profile_image')
+            profile.save()
+
+            login(request, user)
             return redirect('tweet_list')
     else:
         form = UserRegistrationForm()
     return render(request, 'registration/register.html', {'form': form})
+
 
 @login_required
 def like_tweet(request, tweet_id):
@@ -94,7 +98,7 @@ def like_tweet(request, tweet_id):
         })
     
     # Handle regular form submission (fallback)
-    return redirect('tweet_list')
+    return redirect(request.META.get('HTTP_REFERER', 'tweet_list'))
 
 from django.views.decorators.csrf import csrf_exempt  # if needed
 
@@ -180,15 +184,66 @@ def comment_action(request, comment_id, action):
     # Handle regular form submission (fallback) or invalid requests
     return redirect('tweet_list')
 
+# def profile_page(request, username):
+#     user_profile = get_object_or_404(User, username=username)
+#     tweets = Tweet.objects.filter(user=user_profile).order_by('-created_at')
+
+#     try:
+#         profile = user_profile.profile
+#     except Profile.DoesNotExist:
+#         profile = Profile.objects.create(user=user_profile)
+
+#     # Users this user is following
+#     following_users = User.objects.filter(profile__in=user_profile.following.all())
+#     following_profiles = Profile.objects.filter(user__in=following_users)
+
+#     # Users who follow this user
+#     follower_profiles = Profile.objects.filter(followers=user_profile)
+
+#     return render(request, 'profile_page.html', {
+#         'profile': profile,
+#         'user_profile': user_profile,
+#         'tweets': tweets,
+#         'following_profiles': following_profiles,
+#         'follower_profiles': follower_profiles,
+#     })
+
 def profile_page(request, username):
     user_profile = get_object_or_404(User, username=username)
+    tweets = Tweet.objects.filter(user=user_profile).order_by('-created_at')
     try:
         profile = user_profile.profile
     except Profile.DoesNotExist:
         profile = Profile.objects.create(user=user_profile)
     
+    # Users this user is following
+    following_users = User.objects.filter(profile__in=user_profile.following.all())
+    following_profiles = Profile.objects.filter(user__in=following_users)
+    
+    # Users who follow this user (corrected)
+    follower_profiles = user_profile.profile.followers.all()
+    
     return render(request, 'profile_page.html', {
         'profile': profile,
         'user_profile': user_profile,
+        'tweets': tweets,
+        'following_profiles': following_profiles,
+        'follower_profiles': follower_profiles,
     })
 
+@receiver(post_save, sender=User)
+def create_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+
+@login_required
+def toggle_follow(request, username):
+    target_user = get_object_or_404(User, username=username)
+    profile = target_user.profile
+
+    if request.user in profile.followers.all():
+        profile.followers.remove(request.user)
+    else:
+        profile.followers.add(request.user)
+
+    return redirect('profile_page', username=username)

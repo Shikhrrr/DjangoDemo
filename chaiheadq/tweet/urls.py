@@ -22,4 +22,8 @@ urlpatterns = [
     #Profile
     path('user/<str:username>/', views.profile_page, name='profile_page'),
 
+    #follow
+    path('profile/<str:username>/follow/', views.toggle_follow, name='toggle_follow'),
+
+
 ]

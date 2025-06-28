@@ -21,7 +21,10 @@ Chai aur Tweet
         {% endif %}
 
         <div class="card-body">
-            <h5 class="card-title fw-semibold">@{{ tweet.user.username }}</h5>
+            <a href="{% url 'profile_page' tweet.user.username %}" class="text-decoration-none text-light">
+                <h5>@{{ tweet.user.username }}</h5>
+            </a>
+            <p>{{tweet.created_at}}</p>
             <p class="card-text fs-6">{{ tweet.text }}</p>
 
             <form method="post" action="{% url 'like_tweet' tweet.id %}" class="d-inline like-form" data-tweet-id="{{ tweet.id }}">
@@ -45,7 +48,10 @@ Chai aur Tweet
                 <ul class="list-group list-group-flush">
                     {% for liker in tweet.likes.all %}
                         <li class="list-group-item small">
-                            {{ liker.username }}{% if liker == user %} (You){% endif %}
+                            <img src="{{ liker.profile_photo.url }}" class="rounded-circle me-2 h-30 w-30">
+                            <a href="{% url 'profile_page' liker.username %}" class="text-decoration-none text-light">
+                                {{ liker.username }}{% if liker == user %} (You){% endif %}
+                            </a>
                         </li>
                     {% empty %}
                         <li class="list-group-item text-muted">No likes yet</li>
