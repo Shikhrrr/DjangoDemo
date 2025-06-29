@@ -247,3 +247,20 @@ def toggle_follow(request, username):
         profile.followers.add(request.user)
 
     return redirect('profile_page', username=username)
+
+def search_users(request):
+    return render(request, 'search_users.html')
+
+def ajax_search_users(request):
+    query = request.GET.get('q', '')
+    users = User.objects.filter(username__icontains=query)[:10]
+
+    results = []
+    for user in users:
+        profile = getattr(user, 'profile', None)
+        results.append({
+            'username': user.username,
+            'profile_image': profile.profile_image.url if profile and profile.profile_image else '',
+        })
+
+    return JsonResponse({'results': results})

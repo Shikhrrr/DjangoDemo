@@ -19,6 +19,7 @@
         {% comment %} <a href="{% url 'tweet_list' %}" class="btn btn-primary mx-2">Tweet Home</a> {% endcomment %}
         {% if user.is_authenticated %}
         <div class="d-flex align-items-center ms-auto">
+          <a href="{% url 'search_users' %}" class="btn btn-primary me-2">Search Users</a>
           <a href="{% url 'profile_page' user.username %}" class="btn btn-primary me-2">Profile</a>
           <form method="POST" action="{% url 'logout' %}" class="mb-0">
             {% csrf_token %}

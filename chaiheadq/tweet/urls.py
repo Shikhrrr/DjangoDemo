@@ -25,5 +25,8 @@ urlpatterns = [
     #follow
     path('profile/<str:username>/follow/', views.toggle_follow, name='toggle_follow'),
 
+    #search
+    path('search-users/', views.search_users, name="search_users"),
+    path('ajax/search-users/', views.ajax_search_users, name='ajax_search_users'),
 
 ]
