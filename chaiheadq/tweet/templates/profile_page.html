@@ -17,7 +17,7 @@
                             {% if profile.profile_image %}
                                 <img src="{{ profile.profile_image.url }}" class="rounded-circle border border-3 border-light shadow-sm" width="110" height="110" style="object-fit: cover;">
                             {% else %}
-                                <img src="{% static 'default_profile.png' %}" class="rounded-circle border border-3 border-light shadow-sm" width="110" height="110" style="object-fit: cover;">
+                                <img src="{% static 'images/default_profile.png' %}" class="rounded-circle border border-3 border-light shadow-sm" width="110" height="110" style="object-fit: cover;">
                             {% endif %}
                         </div>
                         <div class="flex-grow-1">
@@ -42,6 +42,10 @@
                                         </button>
                                     {% endif %}
                                 </form>
+                            {% else %}
+                                <a href="{% url 'edit_profile' %}" class="btn btn-primary btn-sm px-4" style="border-radius: 20px;">
+                                    <i class="fas fa-user-plus me-1"></i> Edit Profile
+                                </a>
                             {% endif %}
                         </div>
                     </div>
@@ -86,7 +90,7 @@
                                     {% if follower.profile.profile_image %}
                                         <img src="{{ follower.profile.profile_image.url }}" class="rounded-circle me-3 shadow-sm" width="50" height="50" style="object-fit: cover;">
                                     {% else %}
-                                        <img src="{% static 'default_profile.png' %}" class="rounded-circle me-3 shadow-sm" width="50" height="50" style="object-fit: cover;">
+                                        <img src="{% static 'images/default_profile.png' %}" class="rounded-circle me-3 shadow-sm" width="50" height="50" style="object-fit: cover;">
                                     {% endif %}
                                     <div class="flex-grow-1">
                                         <a href="/tweet/user/{{ follower.username }}/" class="text-decoration-none">
@@ -122,7 +126,7 @@
                                     {% if following.profile_image %}
                                         <img src="{{ following.profile_image.url }}" class="rounded-circle me-3 shadow-sm" width="50" height="50" style="object-fit: cover;">
                                     {% else %}
-                                        <img src="{% static 'default_profile.png' %}" class="rounded-circle me-3 shadow-sm" width="50" height="50" style="object-fit: cover;">
+                                        <img src="{% static 'images/default_profile.png' %}" class="rounded-circle me-3 shadow-sm" width="50" height="50" style="object-fit: cover;">
                                     {% endif %}
                                     <div class="flex-grow-1">
                                         <a href="/tweet/user/{{ following.user.username }}/" class="text-decoration-none">

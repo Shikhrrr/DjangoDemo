@@ -29,4 +29,8 @@ urlpatterns = [
     path('search-users/', views.search_users, name="search_users"),
     path('ajax/search-users/', views.ajax_search_users, name='ajax_search_users'),
 
+    #edit profile
+    path('edit_profile/', views.edit_profile, name="edit_profile"),
+    path('profile/remove-image/', views.remove_profile_image, name='remove_profile_image'),
+
 ]

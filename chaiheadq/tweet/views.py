@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .models import Tweet, Comments, Profile
-from .forms import TweetForm, UserRegistrationForm, CommentForm
+from .forms import TweetForm, UserRegistrationForm, CommentForm, EditProfileForm
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
@@ -264,3 +264,22 @@ def ajax_search_users(request):
         })
 
     return JsonResponse({'results': results})
+
+@login_required
+def edit_profile(request):
+    profile = request.user.profile
+    if request.method == 'POST':
+        form = EditProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect('profile_page', username=request.user.username)
+    else:
+        form = EditProfileForm(instance=profile)
+    return render(request, 'edit_profile.html', {'form': form, 'profile': profile})
+
+
+@login_required
+def remove_profile_image(request):
+    profile = request.user.profile
+    profile.profile_image.delete(save=True)
+    return redirect('edit_profile')

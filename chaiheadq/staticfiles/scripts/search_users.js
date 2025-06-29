@@ -13,7 +13,7 @@ document.getElementById('searchInput').addEventListener('input', function () {
                 li.className = 'list-group-item d-flex align-items-center py-3';
 
                 const img = document.createElement('img');
-                img.src = user.profile_image || "{% static '/images/deafult_profile.png' %}";
+                img.src = user.profile_image || '../static/images/default_profile.png';
                 img.className = 'rounded-circle me-3';
                 img.width = 50;
                 img.height = 50;
