@@ -19,7 +19,7 @@ document.getElementById('searchInput').addEventListener('input', function () {
                 img.height = 50;
 
                 const link = document.createElement('a');
-                link.href = `/profile/${user.username}/`;
+                link.href = `/tweet/user/${user.username}/`;
                 link.textContent = `@${user.username}`;
                 link.className = 'text-decoration-none text-light fw-medium';
 

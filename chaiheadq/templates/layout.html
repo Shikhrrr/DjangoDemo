@@ -11,38 +11,81 @@
         {% endblock %}
     </title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
-  </head>
-  <body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="{% url 'tweet_list' %}">TweetBar</a>
-        {% comment %} <a href="{% url 'tweet_list' %}" class="btn btn-primary mx-2">Tweet Home</a> {% endcomment %}
-        {% if user.is_authenticated %}
-        <div class="d-flex align-items-center ms-auto">
-          <a href="{% url 'search_users' %}" class="btn btn-primary me-2">Search Users</a>
-          <a href="{% url 'profile_page' user.username %}" class="btn btn-primary me-2">Profile</a>
-          <form method="POST" action="{% url 'logout' %}" class="mb-0">
-            {% csrf_token %}
-            <button class="btn btn-danger" type="submit">Logout</button>
-          </form>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'styles/layout.css' %}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <div class="d-flex align-items-center">
+                <div class="logo-container me-3">
+                    <img src="{% static 'images/chat.gif' %}" alt="Chat Logo" width="45" height="45" class="rounded-circle">
+                </div>
+                <a class="navbar-brand fw-bold" href="{% url 'tweet_list' %}" style="font-size: 2rem;">
+                  Say App
+                </a>
+            </div>
+            
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="fas fa-bars text-light"></i>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                {% if user.is_authenticated %}
+                <div class="nav-links ms-auto">
+                    <a href="{% url 'search_users' %}" class="btn btn-search" title="Search Users">
+                        <i class="fas fa-search"></i>
+                    </a>
+                    <a href="{% url 'profile_page' user.username %}" class="btn btn-profile">
+                        {% if user.profile.profile_picture %}
+                            <img src="{{ user.profile.profile_picture.url }}" alt="Profile">
+                        {% else %}
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary-gradient); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold;">
+                                {{ user.username|first|upper }}
+                            </div>
+                        {% endif %}
+                        <span>Profile</span>
+                    </a>
+                    <form method="POST" action="{% url 'logout' %}" class="mb-0">
+                        {% csrf_token %}
+                        <button class="btn btn-logout" type="submit">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </button>
+                    </form>
+                </div>
+                {% else %}
+                <div class="nav-links ms-auto">
+                    <a href="{% url 'login' %}" class="btn">
+                        <i class="fas fa-sign-in-alt me-2"></i>Login
+                    </a>
+                    <a href="{% url 'register' %}" class="btn">
+                        <i class="fas fa-user-plus me-2"></i>Register
+                    </a>
+                </div>
+                {% endif %}
+            </div>
         </div>
-        {% else %}
-          <div class="ms-auto d-flex align-items-center">
-            <a href="{% url 'login' %}" class="btn btn-primary mx-2">Login</a>
-            <a href="{% url 'register' %}" class="btn btn-primary mx-2">Register</a>
-          </div>
-        </div>
-      </div>
-
-      {% endif %}
     </nav>
 
-    {% block content %}
-        Default Content
-    {% endblock %}
-  
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js" integrity="sha512-VWbW4...snip..." crossorigin="anonymous" referrerpolicy="no-referrer">
-    </script>
+    <div class="content-wrapper">
+        <div class="container-fluid">
+            {% block content %}
+                <div class="text-center py-5">
+                    <h1 class="display-4 text-light mb-4">Welcome to Say App</h1>
+                    <p class="lead text-light opacity-75">Your voice matters. Share your thoughts with the world.</p>
+                </div>
+            {% endblock %}
+        </div>
+    </div>
 
-  </body>
+    <!-- Floating Create Say Button -->
+    {% if user.is_authenticated %}
+    <a href="{% url 'tweet_create' %}" class="fab-create text-decoration-none" title="Create Say">
+        <i class="fas fa-plus fa-lg"></i>
+    </a>
+    {% endif %}
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'scripts/layout.js' %}"></script>
+</body>
 </html>

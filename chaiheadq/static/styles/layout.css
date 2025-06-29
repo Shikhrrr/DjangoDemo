@@ -1,0 +1,438 @@
+:root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --success-gradient: linear-gradient(135deg, #4facfe 0%, #764ba2 100%);
+    --danger-gradient: linear-gradient(135deg, #fa709a 0%, #667eea 100%);
+    --create-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --create-gradient-hover: linear-gradient(135deg, #7c8ef0 0%, #8a5bb8 100%);
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.1);
+    --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.15);
+    --shadow-create: 0 8px 24px rgba(102, 126, 234, 0.25);
+    --shadow-create-hover: 0 12px 32px rgba(102, 126, 234, 0.35);
+}
+
+* {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    min-height: 100vh;
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+}
+
+/* Glassmorphism Navbar */
+.navbar {
+    backdrop-filter: blur(20px);
+    background: var(--glass-bg) !important;
+    border-bottom: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-soft);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar-brand {
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    transition: all 0.3s ease;
+}
+
+.navbar-brand:hover {
+    transform: scale(1.05);
+    filter: brightness(1.2);
+}
+
+/* Logo Animation */
+.logo-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.logo-container img {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: drop-shadow(0 4px 8px rgba(102, 126, 234, 0.3));
+}
+
+.logo-container:hover img {
+    transform: rotate(360deg) scale(1.1);
+    filter: drop-shadow(0 8px 16px rgba(102, 126, 234, 0.5));
+}
+
+.logo-container::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(transparent, rgba(102, 126, 234, 0.3), transparent);
+    animation: rotate 3s linear infinite;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.logo-container:hover::before {
+    opacity: 1;
+}
+
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Modern Buttons */
+.btn {
+    border: none;
+    border-radius: 12px;
+    padding: 10px 20px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(20px);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: rgba(255, 255, 255, 0.9);
+    box-shadow: var(--shadow-soft);
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.6s;
+}
+
+.btn:hover::before {
+    left: 100%;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
+/* Search Button - Circular */
+.btn-search {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+}
+
+.btn-search:hover {
+    background: rgba(102, 126, 234, 0.2);
+    border-color: rgba(102, 126, 234, 0.4);
+    transform: scale(1.1);
+}
+
+/* Profile Button - Glass style with image */
+.btn-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px 8px 8px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 25px;
+}
+
+.btn-profile img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    object-fit: cover;
+}
+
+.btn-profile:hover {
+    background: rgba(102, 126, 234, 0.2);
+    border-color: rgba(102, 126, 234, 0.4);
+}
+
+.btn-profile:hover img {
+    border-color: rgba(102, 126, 234, 0.6);
+}
+
+/* Logout Button - Danger glass style */
+.btn-logout {
+    background: rgba(250, 112, 154, 0.1);
+    border: 1px solid rgba(250, 112, 154, 0.3);
+}
+
+.btn-logout:hover {
+    background: rgba(250, 112, 154, 0.2);
+    border-color: rgba(250, 112, 154, 0.5);
+}
+
+/* Create Say Button - Refined and Harmonious */
+.btn-create-say {
+    background: var(--create-gradient);
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    border-radius: 12px;
+    padding: 12px 24px;
+    color: white;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    box-shadow: var(--shadow-create);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    white-space: nowrap;
+}
+
+.btn-create-say::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    transition: left 0.5s;
+}
+
+.btn-create-say:hover::before {
+    left: 100%;
+}
+
+.btn-create-say:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-create-hover);
+    background: var(--create-gradient-hover);
+    border-color: rgba(102, 126, 234, 0.5);
+    color: white;
+}
+
+.btn-create-say i {
+    margin-right: 8px;
+    transition: transform 0.3s ease;
+}
+
+.btn-create-say:hover i {
+    transform: translateX(2px);
+}
+
+.create-text {
+    background: linear-gradient(45deg, #ffffff, #f8f9ff, #ffffff);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: subtle-shimmer 4s ease-in-out infinite;
+}
+
+@keyframes subtle-shimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+/* Navigation Links Animation */
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-links .btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-links .btn i {
+    margin-right: 8px;
+    font-size: 0.9em;
+}
+
+/* Page Header - Improved Layout */
+.page-header {
+    padding: 2rem 0 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.page-title {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 700;
+    margin: 0;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    flex: 1;
+    min-width: fit-content;
+}
+
+/* Ensure Create Say button stays to the right */
+.page-header .btn-create-say {
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+/* Content Container */
+.content-wrapper {
+    padding: 0;
+    min-height: calc(100vh - 76px);
+}
+
+/* Floating Create Say Button */
+.fab-create {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--create-gradient);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-create);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+    border: 1px solid rgba(102, 126, 234, 0.3);
+}
+
+.fab-create::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 50%;
+    background: var(--create-gradient-hover);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+}
+
+.fab-create:hover::before {
+    opacity: 1;
+}
+
+.fab-create:hover {
+    transform: scale(1.1);
+    box-shadow: var(--shadow-create-hover);
+    color: white;
+}
+
+.fab-create i {
+    transition: transform 0.3s ease;
+}
+
+.fab-create:hover i {
+    transform: rotate(90deg) scale(1.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.5rem !important;
+    }
+    
+    .nav-links {
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+        margin-top: 1rem;
+        align-items: center;
+    }
+    
+    .nav-links .btn:not(.btn-search):not(.btn-profile) {
+        width: 80%;
+        justify-content: center;
+    }
+    
+    .btn-search {
+        width: 45px;
+        height: 45px;
+    }
+    
+    .btn-profile {
+        width: 80%;
+        justify-content: center;
+    }
+    
+    .page-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+        align-items: center;
+    }
+    
+    .page-header .btn-create-say {
+        margin-left: 0;
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    .page-title {
+        text-align: center;
+        width: 100%;
+    }
+    
+    .btn-create-say {
+        padding: 12px 20px;
+        font-size: 0.95rem;
+    }
+    
+    .fab-create {
+        bottom: 1rem;
+        right: 1rem;
+        width: 55px;
+        height: 55px;
+    }
+}
+
+@media (min-width: 769px) {
+    /* Ensure proper alignment on desktop */
+    .page-header {
+        align-items: baseline;
+    }
+    
+    .page-header .btn-create-say {
+        align-self: flex-start;
+    }
+}
+
+/* Smooth Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-gradient);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--secondary-gradient);
+}

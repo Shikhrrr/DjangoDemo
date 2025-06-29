@@ -7,13 +7,18 @@ Chai aur Tweet
 {% endblock %}
 
 {% block content %}
-<h1 class="text-center my-4 fw-bold">Read and Create Tweets</h1>
-
-<div class="d-flex justify-content-center mb-4">
-    <a href="{% url 'tweet_create' %}" class="btn btn-success">Create Tweet</a>
-</div>
 
 <div class="container">
+    <!-- Page Header with Create Say Button -->
+    <div class="page-header mx-auto d-flex mb-4" style="max-width: 600px;">
+        <h2 class="page-title">Today's Says</h2>
+
+        <a href="{% url 'tweet_create' %}" class="btn btn-create-say">
+            <i class="fas fa-feather-alt me-2"></i>
+            <span class="create-text">Create a Say</span>
+        </a>
+
+    </div>
     {% for tweet in tweets %}
     <div class="card mx-auto mb-4 shadow-sm" style="max-width: 600px; border-radius: 12px;">
         {% if tweet.photo %}
@@ -36,7 +41,7 @@ Chai aur Tweet
                 {% csrf_token %}
                 <button type="submit" class="bg-transparent border-0 fs-5 like-btn">
                     {% if user in tweet.likes.all %}
-                        ❤️
+                        <img src="{% static 'images/heart.png' %}" alt="Liked" style="height: 23px; width: 23px; vertical-align: middle;">
                     {% else %}
                         ♡
                     {% endif %}
