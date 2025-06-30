@@ -1,5 +1,5 @@
 # Say App
-Say app is a social media platform that is used for microblogging built using Django framework.
+Say app is a social media platform that is used for microblogging that is built using Django framework.
 
 
 ## 🚀 Features
