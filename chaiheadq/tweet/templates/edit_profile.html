@@ -4,24 +4,81 @@
 {% block title %}Edit Profile{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
+<style>
+    .edit-profile-card {
+        background: #fff;
+        border: 1px solid #e9ecef;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+        border-radius: 1.5rem;
+        padding: 2.5rem 2rem;
+    }
+    .edit-profile-avatar {
+        border: 4px solid #f1f3f4;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        background: #f8f9fa;
+        transition: box-shadow 0.2s;
+    }
+    .edit-profile-avatar:hover {
+        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+    .edit-profile-btn-remove {
+        color: #dc3545;
+        border-color: #dc3545;
+        background: #fff;
+        transition: background 0.2s, color 0.2s;
+    }
+    .edit-profile-btn-remove:hover {
+        background: #ffeaea;
+        color: #a71d2a;
+    }
+    .edit-profile-label {
+        color: #495057;
+        font-weight: 600;
+    }
+    .edit-profile-form-control {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+    }
+    .edit-profile-form-control:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.2rem rgba(13,110,253,.10);
+        background: #fff;
+    }
+    .edit-profile-btn-save {
+        background: linear-gradient(90deg, #fa709a 0%, #fee140 100%);
+        border: none;
+        color: #fff;
+        font-weight: 600;
+        border-radius: 0.5rem;
+        transition: background 0.2s;
+    }
+    .edit-profile-btn-save:hover {
+        background: linear-gradient(90deg, #fa709a 0%, #fa709a 70% , #fee140 100%);
+        color: #fff;
+        transition: background 0.3s;
+    }
+
+    .bio {
+        border: 1px solid #fa709a;
+    }
+</style>
+<div class="container mt-3">
     <div class="row justify-content-center">
         <div class="col-md-7 col-lg-6">
-            <div class="card shadow rounded-4 p-4">
-                <h3 class="mb-4 text-center fw-bold">Edit Your Profile</h3>
+            <div class="edit-profile-card">
+                <h3 class="mb-4 text-center fw-bold" style="color:#fa709a;">Edit Your Profile</h3>
 
                 <!-- Profile Image Display -->
                 <div class="text-center mb-4">
                     {% if profile.profile_image %}
-                        <img src="{{ profile.profile_image.url }}" alt="Profile Image" class="rounded-circle" height="100" width="100" style="object-fit: cover;">
-                        
-                        <!-- Remove Button with Warning -->
+                        <img src="{{ profile.profile_image.url }}" alt="Profile Image" class="rounded-circle edit-profile-avatar" height="110" width="110" style="object-fit: cover;">
                         <form method="POST" action="{% url 'remove_profile_image' %}" class="mt-2" onsubmit="return confirm('Are you sure you want to remove your profile picture?');">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-outline-danger btn-sm">Remove Profile Picture</button>
+                            <button type="submit" class="btn edit-profile-btn-remove btn-sm">Remove Profile Picture</button>
                         </form>
                     {% else %}
-                        <img src="{% static 'images/default_profile.png' %}" alt="Default Image" class="rounded-circle mb-2" height="100" width="100" style="object-fit: cover;">
+                        <img src="{% static 'images/default_profile.png' %}" alt="Default Image" class="rounded-circle mb-2 edit-profile-avatar" height="110" width="110" style="object-fit: cover;">
                     {% endif %}
                 </div>
 
@@ -30,17 +87,17 @@
                     {% csrf_token %}
 
                     <div class="mb-3">
-                        <label for="id_profile_image" class="form-label fw-semibold">Change Profile Image</label>
-                        <input type="file" name="profile_image" id="id_profile_image" class="form-control">
+                        <label for="id_profile_image" class="form-label edit-profile-label">Change Profile Image</label>
+                        <input type="file" name="profile_image" id="id_profile_image" class="form-control edit-profile-form-control">
                     </div>
 
                     <div class="mb-3">
-                        <label for="id_bio" class="form-label fw-semibold">Bio</label>
-                        <textarea name="bio" id="id_bio" class="form-control" rows="4" placeholder="Tell us something about yourself...">{{ profile.bio|default_if_none:"" }}</textarea>
+                        <label for="id_bio" class="form-label edit-profile-label">Bio</label>
+                        <textarea name="bio" id="id_bio" class="bio form-control edit-profile-form-control text-dark" rows="4" placeholder="Tell us something about yourself...">{{ profile.bio|default_if_none:"" }}</textarea>
                     </div>
 
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <button type="submit" class="btn edit-profile-btn-save">Save Changes</button>
                     </div>
                 </form>
             </div>

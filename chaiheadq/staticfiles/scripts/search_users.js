@@ -13,15 +13,19 @@ document.getElementById('searchInput').addEventListener('input', function () {
                 li.className = 'list-group-item d-flex align-items-center py-3';
 
                 const img = document.createElement('img');
-                img.src = user.profile_image || '../static/images/default_profile.png';
+                img.src = user.profile_image ? user.profile_image : (window.defaultProfileImage || '/static/images/default_profile.png');
+                img.onerror = function() {
+                    this.onerror = null;
+                    this.src = window.defaultProfileImage || '/static/images/default_profile.png';
+                };
                 img.className = 'rounded-circle me-3';
                 img.width = 50;
                 img.height = 50;
 
                 const link = document.createElement('a');
-                link.href = `/profile/${user.username}/`;
+                link.href = `/tweet/user/${user.username}/`;
                 link.textContent = `@${user.username}`;
-                link.className = 'text-decoration-none text-light fw-medium';
+                link.className = 'text-decoration-none text-dark fw-medium';
 
                 li.appendChild(img);
                 li.appendChild(link);

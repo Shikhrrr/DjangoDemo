@@ -13,6 +13,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'styles/layout.css' %}">
+    <link rel="icon" type="image/gif" href="{% static 'images/chat.gif' %}">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg">
@@ -36,15 +37,19 @@
                     <a href="{% url 'search_users' %}" class="btn btn-search" title="Search Users">
                         <i class="fas fa-search"></i>
                     </a>
-                    <a href="{% url 'profile_page' user.username %}" class="btn btn-profile">
+                    <a href="{% url 'profile_page' user.username %}" class="btn btn-profile d-flex align-items-center justify-content-center p-0" style="width: 50px; height: 50px; border-radius: 50%; overflow: hidden;">
                         {% if user.profile.profile_picture %}
                             <img src="{{ user.profile.profile_picture.url }}" alt="Profile">
                         {% else %}
                             <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary-gradient); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold;">
-                                {{ user.username|first|upper }}
+                                {% if user.profile.profile_image %}
+                                  <img src="{{ user.profile.profile_image.url }}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                                {% else %}
+                                  <img src="{% static 'images/default_profile.png' %}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                                {% endif %}
                             </div>
                         {% endif %}
-                        <span>Profile</span>
+                        {% comment %} <span>Profile</span> {% endcomment %}
                     </a>
                     <form method="POST" action="{% url 'logout' %}" class="mb-0">
                         {% csrf_token %}
@@ -86,6 +91,6 @@
     {% endif %}
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script src="{% static 'scripts/layout.js' %}"></script>
+    {% comment %} <script src="{% static 'scripts/layout.js' %}"></script> {% endcomment %}
 </body>
 </html>

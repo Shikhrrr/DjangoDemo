@@ -7,71 +7,76 @@ Chai aur Tweet
 {% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="{% static 'styles/layout.css' %}">
 
 <div class="container">
     <!-- Page Header with Create Say Button -->
     <div class="page-header mx-auto d-flex mb-4" style="max-width: 600px;">
-        <h2 class="page-title">Today's Says</h2>
+        <h1 class="page-title" style="font-color: white;">Today's Says</h1>
 
         <a href="{% url 'tweet_create' %}" class="btn btn-create-say">
-            <i class="fas fa-feather-alt me-2"></i>
+
             <span class="create-text">Create a Say</span>
         </a>
 
     </div>
     {% for tweet in tweets %}
-    <div class="card mx-auto mb-4 shadow-sm" style="max-width: 600px; border-radius: 12px;">
+    <div class="card mx-auto mb-4 shadow-sm" style="max-width: 600px; border-radius: 12px; background: white; border: 2px solid #fa709a;">
         {% if tweet.photo %}
             <img src="{{ tweet.photo.url }}" class="card-img-top rounded-top" alt="Tweet Image" style="max-height: 300px; object-fit: cover;">
         {% endif %}
 
-        <div class="card-body">
-            <a href="{% url 'profile_page' tweet.user.username %}" class="text-decoration-none text-light d-flex align-items-center mb-2">
+        <div class="card-body" style="color: #4B006E;">
+            <a href="{% url 'profile_page' tweet.user.username %}" class="text-decoration-none d-flex align-items-center mb-2" style="color: #4B006E;">
                 {% if tweet.user.profile.profile_image %}
                     <img src="{{ tweet.user.profile.profile_image.url }}" class="rounded-circle me-2 img-fluid" style="height:28px; width:28px; object-fit:cover;">
                 {% else %}
                     <img src="{% static "images/default_profile.png" %}" class="rounded-circle me-2 img-fluid" style="height:28px; width:28px; object-fit:cover;">
                 {% endif %}
-                <h5>{{ tweet.user.username }}</h5>
+                <h5 style="color: #4B006E;">{{ tweet.user.username }}</h5>
             </a>
-            <p>{{tweet.created_at}}</p>
-            <p class="card-text fs-6">{{ tweet.text }}</p>
+            <p style="color: #4B006E;">{{tweet.created_at}}</p>
+            <p class="card-text fs-6" style="color: #4B006E;">{{ tweet.text }}</p>
 
             <form method="post" action="{% url 'like_tweet' tweet.id %}" class="d-inline like-form" data-tweet-id="{{ tweet.id }}">
                 {% csrf_token %}
-                <button type="submit" class="bg-transparent border-0 fs-5 like-btn">
+                <button type="submit" class="bg-transparent border-0 fs-5 like-btn text-dark">
                     {% if user in tweet.likes.all %}
                         <img src="{% static 'images/heart.png' %}" alt="Liked" style="height: 23px; width: 23px; vertical-align: middle;">
                     {% else %}
                         ♡
                     {% endif %}
-                    <span class="like-count">{{ tweet.likes.count }}</span>
+                    <span class="like-count text-dark">{{ tweet.likes.count }}</span>
                 </button>
             </form>
 
-            <button class="btn btn-sm btn-outline-secondary float-end" data-bs-toggle="collapse" data-bs-target="#likes-{{ tweet.id }}">
+            <button class="btn btn-sm btn-outline-secondary float-end show-likes-button" data-bs-toggle="collapse" data-bs-target="#likes-{{ tweet.id }}">
                 Show Likes
             </button>
 
             <!-- Likes collapse -->
-            <div id="likes-{{ tweet.id }}" class="collapse mt-2">
-                <ul class="list-group list-group-flush">
-                    {% for liker in tweet.likes.all %}
-                        <li class="list-group-item small">
-                            {% if liker.profile.profile_image %}
-                                <img src="{{ liker.profile.profile_image.url }}" class="rounded-circle me-2 img-fluid" style="height:24px; width:24px; object-fit:cover;">
-                            {% else %}
-                                <img src="{% static 'images/default_profile.png' %}" class="rounded-circle me-2 img-fluid" style="height:24px; width:24px; object-fit:cover;">
-                            {% endif %}
-
-                            <a href="{% url 'profile_page' liker.username %}" class="text-decoration-none text-light">
-                                {{ liker.username }}{% if liker == user %} (You){% endif %}
-                            </a>
-                        </li>
-                    {% empty %}
-                        <li class="list-group-item text-muted">No likes yet</li>
-                    {% endfor %}
-                </ul>
+            <div id="likes-{{ tweet.id }}" class="collapse mt-3">
+                <div class="card border-0 shadow-sm" style="background: #fff7fa; border-radius: 10px;">
+                    <div class="card-header py-2 px-3" style="background: linear-gradient(90deg, #fa709a 0%, #fee140 100%); border-radius: 10px 10px 0 0;">
+                        <span class="fw-semibold text-dark">Liked by</span>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        {% for liker in tweet.likes.all %}
+                            <li class="list-group-item d-flex align-items-center border-0" style="background: transparent;">
+                                {% if liker.profile.profile_image %}
+                                    <img src="{{ liker.profile.profile_image.url }}" class="rounded-circle me-2" style="height:32px; width:32px; object-fit:cover; border: 2px solid #fa709a;">
+                                {% else %}
+                                    <img src="{% static 'images/default_profile.png' %}" class="rounded-circle me-2" style="height:32px; width:32px; object-fit:cover; border: 2px solid #fa709a;">
+                                {% endif %}
+                                <a href="{% url 'profile_page' liker.username %}" class="fw-semibold text-decoration-none" style="color: #4B006E;">
+                                    {{ liker.username }}{% if liker == user %} <span class="badge bg-warning text-dark ms-1">You</span>{% endif %}
+                                </a>
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item text-muted border-0" style="background: transparent;">No likes yet</li>
+                        {% endfor %}
+                    </ul>
+                </div>
             </div>
 
             {% if tweet.user == user %}
@@ -86,7 +91,7 @@ Chai aur Tweet
         <div class="px-3 py-3 border-top" style="border-radius: 0 0 12px 12px;">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h6 class="mb-0 fw-semibold text-secondary">Comments ({{ tweet.comments.count }})</h6>
-                <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#comments-{{ tweet.id }}" aria-expanded="false">
+                <button class="show-comments-button" data-bs-toggle="collapse" data-bs-target="#comments-{{ tweet.id }}" aria-expanded="false">
                     <span class="toggle-text">Show</span> Comments
                 </button>
             </div>
@@ -97,28 +102,33 @@ Chai aur Tweet
                 <form method="POST" action="{% url 'add_comment' tweet.id %}" class="comment-form" data-tweet-id="{{ tweet.id }}">
                     {% csrf_token %}
                     <div class="input-group mt-2">
-                        <input type="text" name="text" class="form-control" placeholder="Add a comment..." required>
-                        <button type="submit" class="btn btn-outline-primary">Post</button>
+                        <input type="text" name="text" class="form-control border-2 border-danger-subtle text-dark" placeholder="Add a comment..." required style="border-color: #fa709a !important; color: #4B006E !important; background-color: #fff !important; ::placeholder { color: #6c3483 !important; opacity: 1; }">
+                        <button type="submit" class="post-comment-button">Post</button>
                     </div>
                 </form>
 
                 <div class="comments-container mt-3">
-                    <h6 class="mt-3">Recent Comments</h6>
+                    <h6 class="mt-3" style="color:rgb(63, 3, 88);">Recent Comments</h6>
                     {% for comment in tweet.comments.all %}
                         {% if not comment.parent %}
-                            <div class="border rounded p-2 mb-3 position-relative comment-item" data-comment-id="{{ comment.id }}">
+                            <div class="border-light rounded p-2 mb-3 position-relative comment-item" data-comment-id="{{ comment.id }}">
+                                {% if comment.user.profile.profile_image %}
+                                    <img src="{{ comment.user.profile.profile_image.url }}" class="rounded-circle me-2 img-fluid" style="height:24px; width:24px; object-fit:cover;">
+                                {% else %}
+                                    <img src="{% static 'images/default_profile.png' %}" class="rounded-circle me-2 img-fluid" style="height:24px; width:24px; object-fit:cover;">
+                                {% endif %}
                                 <strong>{{ comment.user.username }}</strong>: <span class="comment-text">{{ comment.text }}</span>
 
                                 <!-- Options Dropdown -->
                                 {% if comment.user == user %}
                                 <div class="dropdown float-end">
                                     <button class="btn btn-sm" data-bs-toggle="dropdown">⋯</button>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#" onclick="toggleEditForm('{{ comment.id }}')">Edit</a></li>
+                                    <ul class="dropdown-menu bg-light text-dark border-dark">
+                                        <li><a class="dropdown-item text-dark" href="#" onclick="toggleEditForm('{{ comment.id }}')">Edit</a></li>
                                         <li>
                                             <form method="POST" action="{% url 'comment_action' comment.id 'delete' %}" class="delete-comment-form" data-comment-id="{{ comment.id }}">
                                                 {% csrf_token %}
-                                                <button class="dropdown-item" type="submit">Delete</button>
+                                                <button class="dropdown-item text-dark" type="submit">Delete</button>
                                             </form>
                                         </li>
                                     </ul>
@@ -140,8 +150,8 @@ Chai aur Tweet
                                 <form method="POST" action="{% url 'reply_comment' tweet.id comment.id %}" id="reply-form-{{ comment.id }}" style="display: none;" class="mt-2 reply-form" data-comment-id="{{ comment.id }}" data-tweet-id="{{ tweet.id }}">
                                     {% csrf_token %}
                                     <div class="input-group">
-                                        <input type="text" name="text" class="form-control" placeholder="Write a reply...">
-                                        <button class="btn btn-outline-primary btn-sm" type="submit">Reply</button>
+                                        <input type="text" name="text" class="form-control bg-light text-dark" placeholder="Write a reply..." required style="border-color: #fa709a !important; color: #4B006E !important; background-color: #fff !important; ::placeholder { color: #6c3483 !important; opacity: 1; }">
+                                        <button class="post-comment-button" type="submit">Reply</button>
                                     </div>
                                 </form>
 
@@ -155,7 +165,12 @@ Chai aur Tweet
                                     <!-- Collapsible Replies Container -->
                                     <div id="replies-{{ comment.id }}" class="collapse mt-2 replies-container" data-comment-id="{{ comment.id }}">
                                         {% for reply in comment.replies.all %}
-                                            <div class="border rounded p-2 mt-2 ms-4 reply-item" data-reply-id="{{ reply.id }}">
+                                            <div class="rounded p-2 mt-2 ms-4 reply-item" data-reply-id="{{ reply.id }}">
+                                            {% if reply.user.profile.profile_image %}
+                                                <img src="{{ reply.user.profile.profile_image.url }}" class="rounded-circle me-2 img-fluid" style="height:22px; width:22px; object-fit:cover;">
+                                            {% else %}
+                                                <img src="{% static 'images/default_profile.png' %}" class="rounded-circle me-2 img-fluid" style="height:22px; width:22px; object-fit:cover;">
+                                            {% endif %}
                                                 <strong>{{ reply.user.username }}</strong>: <span class="reply-text">{{ reply.text }}</span>
                                             </div>
                                         {% endfor %}
@@ -165,7 +180,7 @@ Chai aur Tweet
                             </div>
                         {% endif %}
                     {% empty %}
-                        <p class="text-muted no-comments">No comments yet.</p>
+                        <p class="">No comments yet.</p>
                     {% endfor %}
                 </div>
             </div>
@@ -177,3 +192,4 @@ Chai aur Tweet
 <script src="{% static 'scripts/scripts.js' %}"></script>
 
 {% endblock %}
+
